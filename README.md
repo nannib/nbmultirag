@@ -64,7 +64,7 @@ NBMultiRag, permette di:
 
 ### ---------------- Your data remains on your computer ---------------  
 
-An Italian and English framework, which allows you to chat with your documents in RAG, including multimedia (audio, video, images and OCR).
+It is an Italian and English framework, which allows you to chat with your documents in RAG, including multimedia (audio, video, images and OCR).
 The framework is a GUI to chat with a GPT model downloaded from OLLAMA, we recommend LLAMA 3.2 (2Gb) which performs perfectly even on medium-sized machines.
 In addition, you need to install the Tesseract software, for OCR recognition, we recommend choosing Italian and English during installation.
 NBMultiRag, allows you to:
