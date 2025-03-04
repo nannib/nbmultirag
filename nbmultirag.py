@@ -241,6 +241,18 @@ def describe_frame(frame):
     outputs = model.generate(**inputs)
     return processor.decode(outputs[0], skip_special_tokens=True)
 
+def generate_image_description(image_path):
+    try:
+        processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+        model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+        image = Image.open(image_path).convert("RGB")
+        inputs = processor(image, return_tensors="pt")
+        outputs = model.generate(**inputs)
+        caption = processor.decode(outputs[0], skip_special_tokens=True)
+        return caption
+    except Exception as e:
+        return f"Errore nella generazione della descrizione - Error in description generation: {str(e)}"
+
 def extract_text(path, chunk_size, chunk_overlap):
     ext = os.path.splitext(path)[1].lower()
     try:
@@ -261,6 +273,8 @@ def extract_text(path, chunk_size, chunk_overlap):
                 text = BeautifulSoup(f, 'html.parser').get_text()
         elif ext in SUPPORTED_EXT['image']:
             text = pytesseract.image_to_string(Image.open(path), lang=t("tesslang"))
+            text2 = generate_image_description(path)
+            text += "\n".join(text2)
         elif ext in SUPPORTED_EXT['audio']:
             text = whisper.load_model('base').transcribe(path, language=t("whisperlang"))['text']
         elif ext in SUPPORTED_EXT['video']:
