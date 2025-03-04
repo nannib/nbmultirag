@@ -1,0 +1,5 @@
+CHANGELOG
+
+2025-03-04 NbMultiRag 1.1 -Added a feature that describes the content of images in addition to OCR on the texts present. Aggiunta una funzione che descrive il contenuto delle immagini oltre ai l'OCR sui testi presenti
+
+2025-03-03 NbMultirag 1.0 - Launched
