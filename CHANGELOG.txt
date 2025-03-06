@@ -1,7 +1,7 @@
 CHANGELOG
 
-2025-03-06 NbMultiRag 1.2 - added text extraction of file formats not supported by the program. Fixed the creation of a new workspace, with an empty initial vector index.
-Aggiunta l'estrazione di testo formati di file non previsti nel programma. 
+2025-03-06 NbMultiRag 1.2 - added text extraction from file extensions not supported by the program. Fixed the creation of a new workspace, with an empty initial vector index.
+Aggiunta l'estrazione di testo da file con estensioni non previste nel programma. 
 Corretta la creazione di un nuovo workspace, con vector index iniziale vuoto.
 
 2025-03-04 NbMultiRag 1.1 -Added a feature that describes the content of images in addition to OCR on the texts present. 
