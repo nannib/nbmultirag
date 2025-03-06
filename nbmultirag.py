@@ -172,7 +172,20 @@ class WorkspaceManager:
     def list_workspaces(self):
         os.makedirs(WORKSPACES_DIR, exist_ok=True)
         return [d for d in os.listdir(WORKSPACES_DIR) if os.path.isdir(os.path.join(WORKSPACES_DIR, d))]
-
+		
+    def initialize_index_files(self, workspace_path):
+        """Crea i file necessari per l'indice se non esistono"""
+        index_file = os.path.join(workspace_path, "vector.index")
+        metadata_file = os.path.join(workspace_path, "metadata.pkl")
+        log_file = os.path.join(workspace_path, "processed_files.log")
+            # Crea indice vuoto
+        embedding_dim = 768 if "bert" in MODEL_NAME.lower() else 1024
+        index = faiss.IndexFlatL2(embedding_dim)
+        faiss.write_index(index, index_file)
+        with open(metadata_file, "wb") as f:
+            pickle.dump([], f)
+        open(log_file, "w").close()
+			
     def create_workspace(self, name):
         ws_path = os.path.join(WORKSPACES_DIR, name)
         os.makedirs(ws_path, exist_ok=True)
@@ -181,15 +194,17 @@ class WorkspaceManager:
             "embedder": MODEL_NAME,
             "chunk_size": 512,
             "chunk_overlap": 128,
-            "temperature": 0.7,
+            "temperature": 0.5,
             "doc_path": "",
             "llm_model": "no-model",
-            "search_k":5,
-            "num_relevant":3
+            "search_k":8,
+            "num_relevant":6
         }
         with open(os.path.join(ws_path, "config.json"), "w") as f:
             json.dump(config, f)
         self.workspaces = self.list_workspaces()
+	# Inizializza file dell'indice
+        self.initialize_index_files(ws_path)	
 
 def load_workspace_config(workspace):
     config_path = os.path.join(WORKSPACES_DIR, workspace, "config.json")
@@ -282,7 +297,34 @@ def extract_text(path, chunk_size, chunk_overlap):
             frames = extract_video_frames(path)
             frame_descriptions = [f"Frame {idx}: {describe_frame(frame)}" for idx, frame in frames]
             text += "\n".join(frame_descriptions)
+        else:  # Gestione formati non supportati
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    text = f.read()
+                if not text.strip():
+                    return []
+            except UnicodeDecodeError:
+                try:
+                    with open(path, 'r', encoding='latin-1') as f:
+                        text = f.read()
+                    if not text.strip():
+                        return []
+                except Exception as e:
+                    return []
+            except Exception as e:
+                return []
         
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap
+        )
+        return splitter.split_text(text)
+    except Exception as e:
+        if language=="Italian":
+            st.error(f"Errore estrazione da {path}: {e}")
+        else:
+            st.error(f"Extraction error from {path}: {e}")
+        return []       
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap
@@ -404,12 +446,11 @@ def update_index(input_dir, workspace, config):
     
     #index = faiss.IndexFlatL2(DIMENSION) if not os.path.exists(index_file) else faiss.read_index(index_file)
     if not os.path.exists(index_file):
-    # Genera un embedding di esempio per determinare la dimensione
-        sample_embedding = generate_embedding("test", config['embedder'])
-        embedding_dim = sample_embedding.shape[0]
-        index = faiss.IndexFlatL2(embedding_dim)
+       sample_embedding = generate_embedding("test", config['embedder'])
+       embedding_dim = sample_embedding.shape[0]
+       index = faiss.IndexFlatL2(embedding_dim)
     else:
-        index = faiss.read_index(index_file)
+       index = faiss.read_index(index_file)
 
     with st.status(t("updating")):
         for path in new_files:
