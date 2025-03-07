@@ -367,10 +367,15 @@ def generate_embedding(text, embedder_name):
         return outputs.last_hidden_state.mean(dim=1).numpy()[0]
     else:
         response = requests.post(
-            f"{OLLAMA_BASE_URL}/api/embeddings",
-            json={"model": embedder_name, "prompt": text}
+            f"{OLLAMA_BASE_URL}/api/embed",
+            json={"model": embedder_name, "input": text}
         )
-        return np.array(response.json()['embedding'])
+        response.raise_for_status()
+        embedding = np.array(response.json()['embeddings'])
+        # Se l'embedding è un array 2D con una sola riga, estrai il vettore 1D
+        if embedding.ndim == 2 and embedding.shape[0] == 1:
+            embedding = embedding[0]
+        return embedding
 
 # Modifica la definizione della funzione generate_response
 def generate_response(context, query, model_name, temperature, system_prompt):  # Aggiungi system_prompt come parametro
@@ -416,6 +421,25 @@ def update_index(input_dir, workspace, config):
     index_file = os.path.join(ws_path, "vector.index")
     metadata_file = os.path.join(ws_path, "metadata.pkl")
     log_file = os.path.join(ws_path, "processed_files.log")
+    index_config_file = os.path.join(ws_path, "index_config.json")
+
+    # Verifica se i parametri di configurazione sono cambiati
+    rebuild = False
+    if os.path.exists(index_config_file):
+        with open(index_config_file, "r") as f:
+            saved_config = json.load(f)
+        if (saved_config.get("embedder") != config["embedder"] or
+            saved_config.get("chunk_size") != config["chunk_size"] or
+            saved_config.get("chunk_overlap") != config["chunk_overlap"]):
+            rebuild = True
+    else:
+        rebuild = True
+
+    if rebuild:
+        st.info("La configurazione dell'indice è cambiata. Ricostruisco l'indice.../index rebuilding..")
+        for f in [log_file, index_file, metadata_file]:
+            if os.path.exists(f):
+                os.remove(f)
 
     processed_files = get_processed_files(log_file)
     current_files = set()
@@ -428,10 +452,7 @@ def update_index(input_dir, workspace, config):
     removed_files = processed_files - current_files
     
     if removed_files:
-        if language=="Italian":
-            st.info(f"Trovati {len(removed_files)} file rimossi, ricostruisco l'indice...") 
-        else:
-            st.info(f"Found {len(removed_files)} removed files, rebuilding the index...")
+        st.info(f"Trovati {len(removed_files)} file rimossi, ricostruisco l'indice.../file removed index rebuilding")
         for f in [log_file, index_file, metadata_file]:
             if os.path.exists(f):
                 os.remove(f)
@@ -444,13 +465,13 @@ def update_index(input_dir, workspace, config):
         with open(metadata_file, 'rb') as f:
             metadata = pickle.load(f)
     
-    #index = faiss.IndexFlatL2(DIMENSION) if not os.path.exists(index_file) else faiss.read_index(index_file)
+    # Se l'indice non esiste, crealo usando la dimensione dell'embedding di esempio
     if not os.path.exists(index_file):
-       sample_embedding = generate_embedding("test", config['embedder'])
-       embedding_dim = sample_embedding.shape[0]
-       index = faiss.IndexFlatL2(embedding_dim)
+        sample_embedding = generate_embedding("test", config['embedder'])
+        embedding_dim = sample_embedding.shape[0]
+        index = faiss.IndexFlatL2(embedding_dim)
     else:
-       index = faiss.read_index(index_file)
+        index = faiss.read_index(index_file)
 
     with st.status(t("updating")):
         for path in new_files:
@@ -458,13 +479,21 @@ def update_index(input_dir, workspace, config):
             if chunks:
                 for chunk in chunks:
                     embedding = generate_embedding(chunk, config['embedder'])
+                    embedding = np.array(embedding).astype('float32')
+                    if embedding.shape[0] != index.d:
+                        st.warning(f"Mismatch di dimensione per {os.path.basename(path)}. Ricostruisco l'indice.../Index rebuilding")
+                        for f in [log_file, index_file, metadata_file]:
+                            if os.path.exists(f):
+                                os.remove(f)
+                        index = faiss.IndexFlatL2(embedding.shape[0])
+                        metadata = []
+                    index.add(np.array([embedding]))
                     metadata.append({
                         'path': path,
                         'filename': os.path.basename(path),
                         'content': chunk[:1000] + '...',
                         'full_text': chunk
                     })
-                    index.add(np.array([embedding]).astype('float32'))
                 with open(log_file, 'a') as f:
                     f.write(f"{path}\n")
                 st.write(f"✅ {os.path.basename(path)}")
@@ -478,10 +507,15 @@ def update_index(input_dir, workspace, config):
         
         with open(log_file, 'w') as f:
             f.write("\n".join(current_files))
-        if language=="Italian":
-            st.success(f"Indice aggiornato! File nuovi: {len(new_files)}, rimossi: {len(removed_files)}") 
-        else:
-            st.success(f"Index updated! New files: {len(new_files)}, removed: {len(removed_files)}")
+        st.success(f"Indice aggiornato/Index updated! File nuovi/New files: {len(new_files)}, rimossi/removed: {len(removed_files)}")
+    
+    # Salva la configurazione usata per l'indice
+    with open(index_config_file, "w") as f:
+        json.dump({
+            "embedder": config["embedder"],
+            "chunk_size": config["chunk_size"],
+            "chunk_overlap": config["chunk_overlap"]
+        }, f)
 
 # Interfaccia utente
 def main_ui():
@@ -551,7 +585,17 @@ def main_ui():
                new_prompt = st.text_area("System Prompt", value=ws_config.get('system_prompt', st.session_state.default_system_prompt), height=150)
                if new_prompt != ws_config['system_prompt']:
                    ws_config['system_prompt'] = new_prompt
-               ws_config['embedder'] = st.selectbox("Embedder", options=get_embedders(), format_func=lambda x: get_embedders()[x])
+               embedders = get_embedders()
+               options = list(embedders.keys())
+
+      # Trova l'indice del valore salvato o usa 0 come default
+               default_index = options.index(ws_config['embedder']) if ws_config['embedder'] in options else 0
+
+# Crea la selectbox con l'ordinamento corretto
+               selected_embedder = st.selectbox("Embedder", options=options, index=default_index, format_func=lambda x: embedders[x])
+
+# Aggiorna la configurazione
+               ws_config['embedder'] = selected_embedder
                ws_config['chunk_size'] = st.number_input("Chunk Size", min_value=128, max_value=2048, value=ws_config['chunk_size'])
                ws_config['chunk_overlap'] = st.number_input("Chunk Overlap", min_value=0, max_value=512, value=ws_config['chunk_overlap'])
                ws_config['temperature'] = st.slider("Temperature", 0.0, 1.0, ws_config['temperature'])
