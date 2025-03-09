@@ -46,7 +46,7 @@ NBMultiRag, permette di:
 1) crea la cartella nbmultirag
 2) copia tutto il contenuto di questo repository.
 3) crea un enviroment Python: python -m venv nbmultirag
-4) Attivare l'environment (per Windows: nbmultirag/Scripts/activate)
+4) Attivare l'environment (per Windows: nbmultirag\Scripts\activate)
 5) pip install -r requirements
 6) streamlit run nbmultirag.py
 # ENGLISH <a id='ENGLISH'></a>
@@ -92,7 +92,7 @@ NBMultiRag, allows you to:
 1) create the nbmultirag folder
 2) copy all the contents of this repository.
 3) create a Python environment: python -m venv nbmultirag
-4) Activate the environment (for Windows: nbmultirag/Scripts/activate)
+4) Activate the environment (for Windows: nbmultirag\Scripts\activate)
 5) pip install -r requirements
 6) streamlit run nbmultirag.py
 
