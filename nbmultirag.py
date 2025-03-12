@@ -8,7 +8,7 @@ import pickle
 from datetime import datetime
 from transformers import AutoTokenizer, AutoModel, BlipProcessor, BlipForConditionalGeneration
 import torch
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 import docx
 import openpyxl
 from bs4 import BeautifulSoup
