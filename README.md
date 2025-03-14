@@ -13,6 +13,9 @@
 </table>  
 <p align="center">by <a href="https://nannibassetti.com" target="_blank">Nanni Bassetti</a></p>   
 
+VIDEO TUTORIAL  
+https://www.youtube.com/watch?v=56PY07Y_Ve8
+
 [ITALIAN](#ITALIANO)  -  [ENGLISH](#ENGLISH)  
 
 Based on **PYTHON 3.12.4**   
