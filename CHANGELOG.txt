@@ -1,6 +1,8 @@
 CHANGELOG
 
-2025-03-12 NbMultirag 1.4 - some requirements fixed - aggiustati alcuni requirements (pypdf instead of PyPdf2 and transformers library updated)
+2025-03-17 NbMultiRag 1.5 - add launch.py, debug vector index button, increased max size to 15000 for "Number of results in search" and "Number of relevant documents in context"
+
+2025-03-12 NbMultiRag 1.4 - some requirements fixed - aggiustati alcuni requirements (pypdf instead of PyPdf2 and transformers library updated)
 
 2025-03-07 NbMultiRag 1.3 - fixed Ollama embedding models running and added document index rebuild when workspace parameters change.
 Aggiustato il running dei models di embedding di Ollama e aggiunto il rebuild dell'indice dei documenti quando cambiano i parametri del workspace
@@ -12,4 +14,4 @@ Corretta la creazione di un nuovo workspace, con vector index iniziale vuoto.
 2025-03-04 NbMultiRag 1.1 -Added a feature that describes the content of images in addition to OCR on the texts present. 
 Aggiunta una funzione che descrive il contenuto delle immagini oltre ai l'OCR sui testi presenti
 
-2025-03-03 NbMultirag 1.0 - Launched
+2025-03-03 NbMultiRag 1.0 - Launched
