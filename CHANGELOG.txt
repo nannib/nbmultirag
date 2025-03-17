@@ -1,6 +1,6 @@
 CHANGELOG
 
-2025-03-17 NbMultiRag 1.5 - add launcher.py (for making the exe Windows file), debug vector index button, increased max size to 15000 for "Number of results in search" and "Number of relevant documents in context"
+2025-03-17 NbMultiRag 1.5 - added launcher.py (for making the exe Windows file), debug vector index button, increased max size to 15000 for "Number of results in search" and "Number of relevant documents in context"
 
 2025-03-12 NbMultiRag 1.4 - some requirements fixed - aggiustati alcuni requirements (pypdf instead of PyPdf2 and transformers library updated)
 
