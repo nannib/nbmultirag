@@ -51,8 +51,9 @@ NBMultiRag, permette di:
 3) crea un enviroment Python: python -m venv nbmultirag
 4) Attivare l'environment (per Windows: nbmultirag\Scripts\activate)
 5) pip install -r requirements
-6) streamlit run nbmultirag.py
-   ** PER OTTENERE RISULTATI OTTIMALI, È MEGLIO UTILIZZARE UNA DIMENSIONE GRANDE PER "Numero di documenti rilevanti nel contesto" (ad esempio 7000) e una dimensione piccola per "Numero di risultati nella ricerca" (ad esempio 20).  
+6) streamlit run nbmultirag.py  
+
+ ** PER OTTENERE RISULTATI OTTIMALI, È MEGLIO UTILIZZARE UNA DIMENSIONE GRANDE PER "Numero di documenti rilevanti nel contesto" (ad esempio 7000) e una dimensione piccola per "Numero di risultati nella ricerca" (ad esempio 20).  
 # ENGLISH <a id='ENGLISH'></a>
 <table border="0" align="center">
 <tr>
@@ -98,8 +99,9 @@ NBMultiRag, allows you to:
 3) create a Python environment: python -m venv nbmultirag
 4) Activate the environment (for Windows: nbmultirag\Scripts\activate)
 5) pip install -r requirements
-6) streamlit run nbmultirag.py
-   ** FOR BEST RESULTS IT IS BEST TO USE A LARGE SIZE FOR "Number of relevant documents in context" (e.g. 7000) and a small size for "Number of results in search" (e.g. 20).
+6) streamlit run nbmultirag.py  
+
+** FOR BEST RESULTS IT IS BEST TO USE A LARGE SIZE FOR "Number of relevant documents in context" (e.g. 7000) and a small size for "Number of results in search" (e.g. 20).
 
 
 
