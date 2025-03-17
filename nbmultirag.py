@@ -517,6 +517,40 @@ def update_index(input_dir, workspace, config):
             "chunk_overlap": config["chunk_overlap"]
         }, f)
 
+def debug_faiss_index(workspace):
+    ws_path = os.path.join(WORKSPACES_DIR, workspace)
+    index_file = os.path.join(ws_path, "vector.index")
+    metadata_file = os.path.join(ws_path, "metadata.pkl")
+
+    if not os.path.exists(index_file):
+        st.error("Indice non trovato")
+        return
+
+    # Carica l'indice
+    index = faiss.read_index(index_file)
+    
+    # Estrai tutti gli embeddings
+    embeddings = index.reconstruct_n(0, index.ntotal)
+    
+    # Carica i metadati
+    with open(metadata_file, "rb") as f:
+        metadata = pickle.load(f)
+
+    # Stampa informazioni
+    st.subheader("🔍 Debug dell'indice Faiss")
+    st.write(f"Dimensione embeddings: {embeddings.shape}")
+    st.write(f"Numero di elementi nell'indice: {index.ntotal}")
+    st.write(f"Numero di elementi nei metadati: {len(metadata)}")
+
+    # Mostra i primi 5 elementi
+    st.divider()
+    st.write("**Esempio embeddings e metadati:**")
+    for i in range(min(5, index.ntotal)):
+        st.code(f"Embedding {i}: Norma L2 = {np.linalg.norm(embeddings[i]):.2f}")
+        st.write(f"File: {metadata[i]['filename']}")
+        st.write(f"Anteprima testo: {metadata[i]['content'][:200]}...")
+        st.divider()
+
 # Interfaccia utente
 def main_ui():
 
@@ -527,6 +561,7 @@ def main_ui():
         st.title(" NBMultiRAG")
 
     with st.sidebar:
+
         st.header(t("workspace_management"))
         
 
@@ -599,12 +634,14 @@ def main_ui():
                ws_config['chunk_size'] = st.number_input("Chunk Size", min_value=128, max_value=2048, value=ws_config['chunk_size'])
                ws_config['chunk_overlap'] = st.number_input("Chunk Overlap", min_value=0, max_value=512, value=ws_config['chunk_overlap'])
                ws_config['temperature'] = st.slider("Temperature", 0.0, 1.0, ws_config['temperature'])
-               ws_config['search_k'] = st.number_input(t("numberresult"), min_value=1, max_value=50, value=ws_config['search_k'])
-               ws_config['num_relevant'] = st.number_input(t("numberrelevant"), min_value=1, max_value=10, value=ws_config['num_relevant'])
+               ws_config['search_k'] = st.number_input(t("numberresult"), min_value=1, max_value=15000, value=ws_config['search_k'])
+               ws_config['num_relevant'] = st.number_input(t("numberrelevant"), min_value=1, max_value=15000, value=ws_config['num_relevant'])
              # Salvataggio configurazione
             if st.button(t("save_config")):
                 save_workspace_config(current_ws, ws_config)  # Usa la funzione esistente
                 st.success(t("savedconfig"))
+            if st.button("🛠️ Debug Faiss Index"):
+                debug_faiss_index(current_ws)	
 # Sezione UPLOAD All'interno della sezione della sidebar, dopo aver selezionato il workspace e prima di eventuali altre operazioni:
         uploaded_file = st.file_uploader(t("upload_file"), type=[ext[1:] for group in SUPPORTED_EXT.values() for ext in group],key="sidebar_uploader")
 
