@@ -746,10 +746,12 @@ def main_ui():
                     
                     with st.expander(t("docref")):
                         if metadata:
+                            i=0
                             for idx in indices[0]:
                                 if idx < len(metadata):
+                                    i=i+1
                                     doc = metadata[idx]
-                                    st.markdown(f"**{doc['filename']}**")
+                                    st.markdown(f"**{i}) {doc['filename']}**")
                                     st.caption(f"Percorso/Path: {doc['path']}")
                                     st.write(doc['content'][:300] + "...")
                                     st.divider()
