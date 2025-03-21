@@ -36,7 +36,7 @@ NBMultiRag, permette di:
 
 ## ISTRUZIONI PER SISTEMI WINDOWS  
 
-1) Lanciare il file install.bat
+1) Lanciare il file install.bat (istalla Tesseract, Ollama, modello LLama3.2 e FFMpeg)
 2) Nel framework seguire gli avvisi (es. scaricare un modello).
 3) Creare un workspace
 4) Scegliere un embedder (di default c'è bert-base-italian-uncased per l'Italiano e bert-base-uncased per l'Inglese.
@@ -84,7 +84,7 @@ NBMultiRag, allows you to:
 
 ## INSTRUCTIONS FOR WINDOWS SYSTEMS
 
-1) Run the install.bat file
+1) Run the install.bat file (it installs Tesseract, Ollama, LLama3.2 model and FFMpeg)
 2) In the framework follow the prompts (e.g. download a template).
 3) Create a workspace
 4) Choose an embedder (by default there is bert-base-italian-uncased for Italian and bert-base-uncased for English.
