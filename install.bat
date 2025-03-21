@@ -45,6 +45,34 @@ if /I "!ansOllama!"=="S" (
     echo Salto installazione Ollama.
 )
 echo.
+
+:: =====================================================
+:: 3. Scarica ed installa FFmpeg
+:: =====================================================
+echo Vuoi scaricare ed installare FFmpeg? (S/N)
+set /p ansFFmpeg=
+if /I "!ansFFmpeg!"=="S" (
+    echo Scaricando FFmpeg...
+    powershell -Command "Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip' -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'"
+    
+    echo Estrazione in corso...
+    powershell -Command "Expand-Archive -Path 'ffmpeg.zip' -DestinationPath 'ffmpeg_temp'"
+    move "ffmpeg_temp\ffmpeg-*-essentials_build" "C:\ffmpeg" >nul 2>&1
+    rmdir /s /q ffmpeg_temp
+    
+    echo Aggiunta di C:\ffmpeg\bin al PATH...
+    setx PATH "%PATH%;C:\ffmpeg\bin"
+    
+    echo.
+    echo Attenzione:
+    echo 1. Riavvia il sistema per applicare le modifiche al PATH.
+    echo 2. Se C:\ffmpeg\bin non esiste, controlla manualmente la cartella estratta.
+    del ffmpeg.zip
+) else (
+    echo Salto installazione FFmpeg.
+)
+echo.
+
 echo Operazione completata.
 pause
 endlocal
