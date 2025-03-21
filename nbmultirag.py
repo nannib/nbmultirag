@@ -402,7 +402,7 @@ def generate_response(context, query, model_name, temperature, system_prompt):  
                     "num_ctx": 4096
                 }
             },
-            timeout=120
+            timeout=180
         )
         response.raise_for_status()
         return response.json()['message']['content']
