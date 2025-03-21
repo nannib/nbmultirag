@@ -1,5 +1,7 @@
 CHANGELOG
 
+2025-03-21 NbMultiRag 1.7 - changed install.bat to install ffmpeg and expanded the model response timeout to 180 seconds. Cambiato install.bat per installare ffmpeg ed espanso il tempo di risposta del modello a 180 secondi  
+
 2025-03-18 NbMultiRag 1.6 - added numbering in the list of Reference documents - aggiunta la numerazione nella lista dei Documenti di riferimento
 
 2025-03-17 NbMultiRag 1.5 - added launcher.py (for making the exe Windows file), debug vector index button, increased max size to 15000 for "Number of results in search" and "Number of relevant documents in context"
