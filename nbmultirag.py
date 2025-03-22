@@ -661,7 +661,7 @@ def main_ui():
         
         # Costruisci un messaggio per la chat, ad esempio concatenando i chunk (o scegliendo solo i primi)
                if chunks:
-                   file_content = "\n\n".join(chunks[:3])  # ad esempio, i primi 3 chunk
+                   file_content = "\n\n".join(chunks[:30])  # ad esempio, i primi 3 chunk
                else:
                    file_content = "Nessun contenuto rilevato nel file./No content found."
         
