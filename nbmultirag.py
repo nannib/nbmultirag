@@ -399,7 +399,7 @@ def generate_response(context, query, model_name, temperature, system_prompt):  
                 "stream": False,
                 "options": {
                     "temperature": temperature,
-                    "num_ctx": 4096
+                    "num_ctx": 8192
                 }
             },
             timeout=180
