@@ -1,5 +1,7 @@
 CHANGELOG
 
+2025-03-23 NbMultiRag 1.8 - Fixed the chat memory, expandend to 15 results from Debug Faiss Index, expanded to 8192 the context window, expanded to 30 chunks the uploaded document content, expanded to 2000 characters of the documents summaries. - Corretta la memoria della chat, estesa a 15 risultati dall'indice Debug Faiss, estesa a 8192 la finestra di contesto, esteso a 30 blocchi il contenuto del documento caricato, esteso a 2000 caratteri i riepiloghi dei documenti.
+
 2025-03-21 NbMultiRag 1.7 - changed install.bat to install ffmpeg and expanded the model response timeout to 180 seconds. Cambiato install.bat per installare ffmpeg ed espanso il tempo di risposta del modello a 180 secondi  
 
 2025-03-18 NbMultiRag 1.6 - added numbering in the list of Reference documents - aggiunta la numerazione nella lista dei Documenti di riferimento
