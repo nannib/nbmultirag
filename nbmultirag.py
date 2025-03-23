@@ -378,24 +378,20 @@ def generate_embedding(text, embedder_name):
         return embedding
 
 # Modifica la definizione della funzione generate_response
-def generate_response(context, query, model_name, temperature, system_prompt):  # Aggiungi system_prompt come parametro
-    messages = [
-        {
-            "role": "system",
-            "content": system_prompt + f"\n\nContesto documenti:\n{context or 'Nessun documento rilevante/No relevant documents' }"
-        },
-        {
-            "role": "user", 
-            "content": query
-        }
-    ]
+def generate_response(messages, context, query, model_name, temperature, system_prompt):
+    messages.append({
+        "role": "user",
+        "content": query
+    })
     
     try:
         response = requests.post(
             f"{OLLAMA_BASE_URL}/api/chat",
             json={
                 "model": model_name,
-                "messages": messages,
+                "messages": [
+                    {"role": "system", "content": system_prompt}
+                ] + messages,
                 "stream": False,
                 "options": {
                     "temperature": temperature,
@@ -661,7 +657,7 @@ def main_ui():
         
         # Costruisci un messaggio per la chat, ad esempio concatenando i chunk (o scegliendo solo i primi)
                if chunks:
-                   file_content = "\n\n".join(chunks[:30])  # ad esempio, i primi 3 chunk
+                   file_content = "\n\n".join(chunks[:30])  # ad esempio, i primi 30 chunk
                else:
                    file_content = "Nessun contenuto rilevato nel file./No content found."
         
@@ -739,7 +735,7 @@ def main_ui():
                         if relevant_docs:
                             context = "\n\n".join(relevant_docs)
                     
-                    response = generate_response(context,prompt,selected_model,ws_config['temperature'],ws_config['system_prompt'])
+                    response = generate_response(st.session_state.messages, context,prompt,selected_model,ws_config['temperature'],ws_config['system_prompt'])
                     
                     st.markdown(response)
                     st.session_state.messages.append({"role": "assistant", "content": response})
@@ -753,7 +749,8 @@ def main_ui():
                                     doc = metadata[idx]
                                     st.markdown(f"**{i}) {doc['filename']}**")
                                     st.caption(f"Percorso/Path: {doc['path']}")
-                                    st.write(doc['content'][:300] + "...")
+                                    # Visualizza i primi 2000 caratteri del contenuto del documento
+                                    st.write(doc['content'][:2000] + "...")
                                     st.divider()
                         else:
                             st.warning(t("no_documents"))
