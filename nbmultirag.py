@@ -541,7 +541,7 @@ def debug_faiss_index(workspace):
     # Mostra i primi 5 elementi
     st.divider()
     st.write("**Esempio embeddings e metadati:**")
-    for i in range(min(5, index.ntotal)):
+    for i in range(min(15, index.ntotal)):
         st.code(f"Embedding {i}: Norma L2 = {np.linalg.norm(embeddings[i]):.2f}")
         st.write(f"File: {metadata[i]['filename']}")
         st.write(f"Anteprima testo: {metadata[i]['content'][:200]}...")
