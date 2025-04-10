@@ -379,10 +379,16 @@ def generate_embedding(text, embedder_name):
 
 # Modifica la definizione della funzione generate_response
 def generate_response(messages, context, query, model_name, temperature, system_prompt):
-    messages.append({
-        "role": "user",
-        "content": query
-    })
+    messages = [
+        {
+            "role": "system",
+            "content": system_prompt + f"\n\nContesto documenti:\n{context or 'Nessun documento rilevante/No relevant documents' }"
+        },
+        {
+            "role": "user", 
+            "content": " ".join(str(x) for x in messages) + query
+        }
+    ]
     
     try:
         response = requests.post(
@@ -538,7 +544,7 @@ def debug_faiss_index(workspace):
     st.write(f"Numero di elementi nell'indice: {index.ntotal}")
     st.write(f"Numero di elementi nei metadati: {len(metadata)}")
 
-    # Mostra i primi 5 elementi
+    # Mostra i primi 15 elementi
     st.divider()
     st.write("**Esempio embeddings e metadati:**")
     for i in range(min(15, index.ntotal)):
