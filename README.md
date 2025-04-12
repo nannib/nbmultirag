@@ -53,7 +53,7 @@ NBMultiRag, permette di:
 5) pip install -r requirements.txt
 6) streamlit run nbmultirag.py  
 
- ** PER OTTENERE RISULTATI OTTIMALI, È MEGLIO UTILIZZARE UNA DIMENSIONE GRANDE PER "Numero di documenti rilevanti nel contesto" (ad esempio 7000) e una dimensione piccola per "Numero di risultati nella ricerca" (ad esempio 20).  
+ ** PER OTTENERE RISULTATI OTTIMALI, È MEGLIO UTILIZZARE UNA DIMENSIONE GRANDE PER "Numero di documenti rilevanti nel contesto" (ad esempio 700) e una dimensione piccola per "Numero di risultati nella ricerca" (ad esempio 20).  
 # ENGLISH <a id='ENGLISH'></a>
 <table border="0" align="center">
 <tr>
@@ -101,7 +101,7 @@ NBMultiRag, allows you to:
 5) pip install -r requirements.txt
 6) streamlit run nbmultirag.py  
 
-** FOR BEST RESULTS IT IS BEST TO USE A LARGE SIZE FOR "Number of relevant documents in context" (e.g. 7000) and a small size for "Number of results in search" (e.g. 20).
+** FOR BEST RESULTS IT IS BEST TO USE A LARGE SIZE FOR "Number of relevant documents in context" (e.g. 700) and a small size for "Number of results in search" (e.g. 20).
 
 
 
