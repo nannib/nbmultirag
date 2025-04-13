@@ -395,9 +395,7 @@ def generate_response(messages, context, query, model_name, temperature, system_
             f"{OLLAMA_BASE_URL}/api/chat",
             json={
                 "model": model_name,
-                "messages": [
-                    {"role": "system", "content": system_prompt}
-                ] + messages,
+                "messages": messages,
                 "stream": False,
                 "options": {
                     "temperature": temperature,
