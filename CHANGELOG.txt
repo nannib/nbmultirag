@@ -1,5 +1,7 @@
 CHANGELOG
 
+2025-04-13 NbMultiRag 2.0 - Changed the response code from: "messages": [ {"role": "system", "content": system_prompt} ] + messages in "messages": messages.
+
 2025-04-10 NbMultirag 1.9 - Fixed bug in function generate_response with this fix: ("content": " ".join(str(x) for x in messages) + query). 
 
 2025-03-23 NbMultiRag 1.8 - Fixed the chat memory, expandend to 15 results from Debug Faiss Index, expanded to 8192 the context window, expanded to 30 chunks the uploaded document content, expanded to 2000  
