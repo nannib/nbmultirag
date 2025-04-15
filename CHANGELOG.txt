@@ -1,5 +1,7 @@
 CHANGELOG
 
+2025-04-15 NbMultiRag 2.1 - improved text extraction from image files.
+
 2025-04-13 NbMultiRag 2.0 - Changed the response code from: "messages": [ {"role": "system", "content": system_prompt} ] + messages in "messages": messages.
 
 2025-04-10 NbMultirag 1.9 - Fixed bug in function generate_response with this fix: ("content": " ".join(str(x) for x in messages) + query). 
