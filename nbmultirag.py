@@ -289,7 +289,7 @@ def extract_text(path, chunk_size, chunk_overlap):
         elif ext in SUPPORTED_EXT['image']:
             text = pytesseract.image_to_string(Image.open(path), lang=t("tesslang"))
             text2 = generate_image_description(path)
-            text += "\n".join(text2)
+            text += "".join(text2)
         elif ext in SUPPORTED_EXT['audio']:
             text = whisper.load_model('base').transcribe(path, language=t("whisperlang"))['text']
         elif ext in SUPPORTED_EXT['video']:
