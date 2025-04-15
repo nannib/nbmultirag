@@ -5,7 +5,7 @@
 <table border="0"align="center">
   <tr>
     <td>
-      <img src="![image](https://github.com/user-attachments/assets/dbd5a197-1f61-4d48-8d85-9d66473e71c6)" width="90" height="90" /> 
+      <img src="https://github.com/user-attachments/assets/dbd5a197-1f61-4d48-8d85-9d66473e71c6" width="90" height="90" /> 
     </td>
     <td>
        <h1><b>NbMultiRag - un GPT tutto in LOCALE</b></h1>
@@ -59,7 +59,7 @@ NBMultiRag, permette di:
 <table border="0" align="center">
 <tr>
 <td>
-<img src="![image](https://github.com/user-attachments/assets/0307e4b3-12be-48f6-a55a-a00ab57bb470)
+<img src="https://github.com/user-attachments/assets/0307e4b3-12be-48f6-a55a-a00ab57bb470
 " width="90" height="90" />
 </td>
 <td>
