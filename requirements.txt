@@ -12,6 +12,6 @@ pytesseract==0.3.13
 requests==2.32.3
 streamlit==1.42.2
 torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124
-transformers==4.49.0
+transformers==4.50.0
 docx==0.2.4
 python-docx==1.1.2
