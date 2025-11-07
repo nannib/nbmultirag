@@ -1,5 +1,4 @@
 import os
-import io
 import json
 import requests
 import streamlit as st
@@ -9,25 +8,20 @@ import pickle
 from datetime import datetime
 from transformers import AutoTokenizer, AutoModel, BlipProcessor, BlipForConditionalGeneration
 import torch
-from pypdf import PdfReader
+from PyPDF2 import PdfReader
 import docx
 import openpyxl
 from bs4 import BeautifulSoup
 from PIL import Image
 import pytesseract
 import whisper
-from moviepy import VideoFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 import cv2
 from tkinter import Tk, filedialog
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import tempfile
 from requests.exceptions import ConnectionError
-
-# Additional import for extracting images from PDFs
-try:
-    import fitz  # PyMuPDF
-except ImportError:
-    fitz = None
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 torch.classes.__path__ = []
@@ -107,7 +101,7 @@ try:
 except ConnectionError:
     st.error("Impossibile connettersi a Ollama. Verifica che sia in esecuzione / Unable to connect to Ollama. Make sure it is running ") 
     st.stop()
-
+	
 SUPPORTED_EXT = {
     'text': ['.pdf', '.docx', '.xlsx', '.txt', '.html'],
     'image': ['.png', '.jpg', '.jpeg'],
@@ -179,7 +173,7 @@ class WorkspaceManager:
     def list_workspaces(self):
         os.makedirs(WORKSPACES_DIR, exist_ok=True)
         return [d for d in os.listdir(WORKSPACES_DIR) if os.path.isdir(os.path.join(WORKSPACES_DIR, d))]
-        
+		
     def initialize_index_files(self, workspace_path):
         """Crea i file necessari per l'indice se non esistono"""
         index_file = os.path.join(workspace_path, "vector.index")
@@ -192,7 +186,7 @@ class WorkspaceManager:
         with open(metadata_file, "wb") as f:
             pickle.dump([], f)
         open(log_file, "w").close()
-            
+			
     def create_workspace(self, name):
         ws_path = os.path.join(WORKSPACES_DIR, name)
         os.makedirs(ws_path, exist_ok=True)
@@ -210,8 +204,8 @@ class WorkspaceManager:
         with open(os.path.join(ws_path, "config.json"), "w") as f:
             json.dump(config, f)
         self.workspaces = self.list_workspaces()
-    # Inizializza file dell'indice
-        self.initialize_index_files(ws_path)    
+	# Inizializza file dell'indice
+        self.initialize_index_files(ws_path)	
 
 def load_workspace_config(workspace):
     config_path = os.path.join(WORKSPACES_DIR, workspace, "config.json")
@@ -225,54 +219,17 @@ def save_workspace_config(workspace, config):
     with open(config_path, "w") as f:
         json.dump(config, f)
 
-# ----------------------------
-# New helper functions for embedded images
-# ----------------------------
-
-def extract_images_from_pdf(pdf_path):
-    """Extracts images from a PDF file as byte arrays (requires PyMuPDF)."""
-    images = []
-    if fitz is None:
-        return images
-    doc = fitz.open(pdf_path)
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        image_list = page.get_images(full=True)
-        for img_index, img in enumerate(image_list):
-            xref = img[0]
-            base_image = doc.extract_image(xref)
-            image_bytes = base_image["image"]
-            images.append(image_bytes)
-    return images
-
-def extract_images_from_docx(docx_path):
-    """Extracts images from a DOCX file as byte arrays."""
-    images = []
-    document = docx.Document(docx_path)
-    for rel in document.part.rels.values():
-        if "image" in rel.target_ref:
-            images.append(rel.target_part.blob)
-    return images
-
-def analyze_image_bytes(img_bytes):
-    """Runs OCR and BLIP captioning on image bytes and returns the combined result."""
-    try:
-        image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-        ocr_text = pytesseract.image_to_string(image, lang=t("tesslang"))
-        try:
-            # BLIP expects a PIL.Image
-            caption = generate_image_description(image)
-        except Exception as e:
-            caption = f"[BLIP Error]: {str(e)}"
-        return f"[Image OCR]: {ocr_text.strip()}\n[Image Caption]: {caption.strip()}"
-    except Exception as e:
-        return f"[Image analysis error]: {str(e)}"
-
 # Funzioni di estrazione testo
 def extract_text_from_video(path):
     try:
         temp_audio = f"temp_{datetime.now().timestamp()}.wav"
         clip = VideoFileClip(path)
+        if clip.audio is None:
+            if language=="Italian":
+                st.warning("Il video non contiene una traccia audio. Impossibile estrarre il testo.")
+            else:
+                st.warning("The video does not contain an audio track. Cannot extract text.")
+            return ""
         clip.audio.write_audiofile(temp_audio)
         text = whisper.load_model('base').transcribe(temp_audio)['text']
         os.remove(temp_audio)
@@ -306,15 +263,11 @@ def describe_frame(frame):
     outputs = model.generate(**inputs)
     return processor.decode(outputs[0], skip_special_tokens=True)
 
-def generate_image_description(image_or_path):
+def generate_image_description(image_path):
     try:
         processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
         model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-        # Accept either a filepath or a PIL Image
-        if isinstance(image_or_path, str):
-            image = Image.open(image_or_path).convert("RGB")
-        else:
-            image = image_or_path
+        image = Image.open(image_path).convert("RGB")
         inputs = processor(image, return_tensors="pt")
         outputs = model.generate(**inputs)
         caption = processor.decode(outputs[0], skip_special_tokens=True)
@@ -322,30 +275,15 @@ def generate_image_description(image_or_path):
     except Exception as e:
         return f"Errore nella generazione della descrizione - Error in description generation: {str(e)}"
 
-# ----------------------------
-# Patch extract_text function: now handles embedded images in PDF/DOCX
-# ----------------------------
-
 def extract_text(path, chunk_size, chunk_overlap):
     ext = os.path.splitext(path)[1].lower()
     try:
         text = ""
-        image_text_chunks = []
         if ext == '.pdf':
             with open(path, 'rb') as f:
                 text = ''.join([page.extract_text() for page in PdfReader(f).pages])
-            # Extract and analyze images
-            pdf_images = extract_images_from_pdf(path)
-            for idx, img_bytes in enumerate(pdf_images):
-                img_analysis = analyze_image_bytes(img_bytes)
-                image_text_chunks.append(f"PDF Embedded Image {idx+1}:\n{img_analysis}")
         elif ext == '.docx':
             text = '\n'.join([p.text for p in docx.Document(path).paragraphs])
-            # Extract and analyze images
-            docx_images = extract_images_from_docx(path)
-            for idx, img_bytes in enumerate(docx_images):
-                img_analysis = analyze_image_bytes(img_bytes)
-                image_text_chunks.append(f"DOCX Embedded Image {idx+1}:\n{img_analysis}")
         elif ext == '.xlsx':
             wb = openpyxl.load_workbook(path)
             text = ' '.join(str(cell.value) for sheet in wb for row in sheet.iter_rows() for cell in row)
@@ -382,18 +320,23 @@ def extract_text(path, chunk_size, chunk_overlap):
                     return []
             except Exception as e:
                 return []
-
-        # Combine text and image chunks
-        full_text = text
-        if image_text_chunks:
-            # Optionally, add images at the end, or interleave as separate chunks
-            full_text += "\n\n" + "\n\n".join(image_text_chunks)
-
+        
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap
         )
-        return splitter.split_text(full_text)
+        return splitter.split_text(text)
+    except Exception as e:
+        if language=="Italian":
+            st.error(f"Errore estrazione da {path}: {e}")
+        else:
+            st.error(f"Extraction error from {path}: {e}")
+        return []       
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap
+        )
+        return splitter.split_text(text)
     except Exception as e:
         if language=="Italian":
             st.error(f"Errore estrazione da {path}: {e}")
@@ -705,7 +648,7 @@ def main_ui():
                 save_workspace_config(current_ws, ws_config)  # Usa la funzione esistente
                 st.success(t("savedconfig"))
             if st.button("🛠️ Debug Faiss Index"):
-                debug_faiss_index(current_ws)    
+                debug_faiss_index(current_ws)	
 # Sezione UPLOAD All'interno della sezione della sidebar, dopo aver selezionato il workspace e prima di eventuali altre operazioni:
         uploaded_file = st.file_uploader(t("upload_file"), type=[ext[1:] for group in SUPPORTED_EXT.values() for ext in group],key="sidebar_uploader")
 
@@ -737,7 +680,7 @@ def main_ui():
 
         
             except Exception as e:
-                st.error(f"Errore caricamento file: {str(e)}")        
+                st.error(f"Errore caricamento file: {str(e)}")		
         # Selezione cartella
         def get_folder_path():
             root = Tk()
