@@ -2,17 +2,17 @@ bs4==0.0.2
 faiss-cpu==1.10.0
 langchain==0.3.19
 moviepy==2.1.2
-numpy
+numpy==2.0.1
 openai-whisper==20240930
 opencv-python==4.11.0.86
 openpyxl==3.1.5
 pillow==10.4.0
-pypdf==5.3.1
+PyPDF2==3.0.1
 pytesseract==0.3.13
-requests==2.32.3
+requests==2.32.5
 streamlit==1.42.2
-torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124
-transformers==4.50.0
+torch==2.9.0 --index-url https://download.pytorch.org/whl/cu124
+transformers==4.57.1
 docx==0.2.4
 python-docx==1.1.2
 pymupdf==1.26.4
