@@ -1,8 +1,10 @@
 CHANGELOG
 
+2025-11-12 NbMultirag 2.4 - restored extracting the embedded images in PDF, DOCX and now from PPTX too - ripristinata l'estrazione delle immagini incorporate nei PDF, DOCX ed ora anche nei PPTX.
+
 2025-11-07 NbMultiRag 2.3 - fixed the issue with videos without audio and upgraded requirements.txt - aggiustato il problema dei video senza audio e aggiornato il file requirements.txt
 
-2025-10-08 NbMultiRag 2.2 - It can extract and embed images from PDF and DOCX files - può estrarre ed indicizzare nel RAG, le immagini contenute in file PDF e DOCX.
+2025-10-08 NbMultiRag 2.2 - It can extract the embedded images from PDF and DOCX files - può estrarre ed indicizzare nel RAG, le immagini contenute in file PDF e DOCX.
 
 2025-04-15 NbMultiRag 2.1 - improved text extraction from image files.
 
@@ -33,5 +35,6 @@ Corretta la creazione di un nuovo workspace, con vector index iniziale vuoto.
 Aggiunta una funzione che descrive il contenuto delle immagini oltre ai l'OCR sui testi presenti
 
 2025-03-03 NbMultiRag 1.0 - Launched
+
 
 
