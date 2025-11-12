@@ -9,6 +9,7 @@ openpyxl==3.1.5
 pillow==10.4.0
 PyPDF2==3.0.1
 pytesseract==0.3.13
+python-pptx==0.6.23
 requests==2.32.5
 streamlit==1.42.2
 torch==2.9.0 --index-url https://download.pytorch.org/whl/cu124
