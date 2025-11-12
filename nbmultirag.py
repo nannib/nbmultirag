@@ -19,6 +19,15 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 import cv2
 from tkinter import Tk, filedialog
+import io # Added for image analysis
+try:
+    import fitz # PyMuPDF
+except ImportError:
+    fitz = None
+try:
+    from pptx import Presentation
+except ImportError:
+    Presentation = None
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import tempfile
 from requests.exceptions import ConnectionError
@@ -103,7 +112,7 @@ except ConnectionError:
     st.stop()
 	
 SUPPORTED_EXT = {
-    'text': ['.pdf', '.docx', '.xlsx', '.txt', '.html'],
+    'text': ['.pdf', '.docx', '.xlsx', '.txt', '.html', '.pptx', '.ppt'],
     'image': ['.png', '.jpg', '.jpeg'],
     'audio': ['.mp3', '.wav', '.m4a'],
     'video': ['.mp4', '.avi', '.mov']
@@ -275,15 +284,95 @@ def generate_image_description(image_path):
     except Exception as e:
         return f"Errore nella generazione della descrizione - Error in description generation: {str(e)}"
 
+def extract_images_from_pdf(pdf_path):
+    """Extracts images from a PDF file as byte arrays (requires PyMuPDF)."""
+    images = []
+    if fitz is None:
+        return images
+    doc = fitz.open(pdf_path)
+    for page_num in range(len(doc)):
+        page = doc[page_num]
+        image_list = page.get_images(full=True)
+        for img_index, img in enumerate(image_list):
+            xref = img[0]
+            base_image = doc.extract_image(xref)
+            image_bytes = base_image["image"]
+            images.append(image_bytes)
+    return images
+
+def extract_images_from_docx(docx_path):
+    """Extracts images from a DOCX file as byte arrays."""
+    images = []
+    document = docx.Document(docx_path)
+    for rel in document.part.rels.values():
+        if "image" in rel.target_ref:
+            images.append(rel.target_part.blob)
+    return images
+
+def extract_images_from_pptx(pptx_path):
+    """Extracts images from a PPTX file as byte arrays."""
+    images = []
+    if Presentation is None:
+        return images
+    
+    try:
+        presentation = Presentation(pptx_path)
+        for slide in presentation.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, 'image'):
+                    # Estrai l'immagine dalla forma
+                    image_bytes = shape.image.blob
+                    images.append(image_bytes)
+                elif shape.shape_type == 13:  # Tipo 13 è Picture
+                    # Estrai l'immagine dalla forma Picture
+                    image_bytes = shape.image.blob
+                    images.append(image_bytes)
+    except Exception as e:
+        if language=="Italian":
+            st.error(f"Errore estrazione immagini da PowerPoint: {e}")
+        else:
+            st.error(f"PowerPoint image extraction error: {e}")
+    
+    return images
+
+def analyze_image_bytes(img_bytes):
+    """Runs OCR and BLIP captioning on image bytes and returns the combined result."""
+    try:
+        image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+        ocr_text = pytesseract.image_to_string(image, lang=t("tesslang"))
+        try:
+            # BLIP expects a PIL.Image
+            caption = generate_image_description(image)
+        except Exception as e:
+            caption = f"[BLIP Error]: {str(e)}"
+        return f"[Image OCR]: {ocr_text.strip()}\n[Image Caption]: {caption.strip()}"
+    except Exception as e:
+        return f"[Image analysis error]: {str(e)}"
+
 def extract_text(path, chunk_size, chunk_overlap):
     ext = os.path.splitext(path)[1].lower()
     try:
         text = ""
         if ext == '.pdf':
+            # Extract text from PDF
             with open(path, 'rb') as f:
                 text = ''.join([page.extract_text() for page in PdfReader(f).pages])
+            
+            # Extract and analyze images from PDF
+            images = extract_images_from_pdf(path)
+            for img_bytes in images:
+                text += "\n" + analyze_image_bytes(img_bytes)
+
         elif ext == '.docx':
-            text = '\n'.join([p.text for p in docx.Document(path).paragraphs])
+            # Extract text from DOCX
+            document = docx.Document(path)
+            text = '\n'.join([p.text for p in document.paragraphs])
+
+            # Extract and analyze images from DOCX
+            images = extract_images_from_docx(path)
+            for img_bytes in images:
+                text += "\n" + analyze_image_bytes(img_bytes)
+
         elif ext == '.xlsx':
             wb = openpyxl.load_workbook(path)
             text = ' '.join(str(cell.value) for sheet in wb for row in sheet.iter_rows() for cell in row)
@@ -293,6 +382,42 @@ def extract_text(path, chunk_size, chunk_overlap):
         elif ext == '.html':
             with open(path, 'r', encoding='utf-8') as f:
                 text = BeautifulSoup(f, 'html.parser').get_text()
+        elif ext in ['.pptx', '.ppt']:
+            # Estrai testo e immagini da PowerPoint
+            if Presentation is None:
+                if language=="Italian":
+                    st.error("python-pptx non installato. Installa con: pip install python-pptx")
+                else:
+                    st.error("python-pptx not installed. Install with: pip install python-pptx")
+                return []
+            
+            try:
+                presentation = Presentation(path)
+                text_parts = []
+                
+                # Estrai testo da tutte le slide
+                for i, slide in enumerate(presentation.slides):
+                    slide_text = []
+                    for shape in slide.shapes:
+                        if hasattr(shape, 'text') and shape.text.strip():
+                            slide_text.append(shape.text.strip())
+                    
+                    if slide_text:
+                        text_parts.append(f"Slide {i+1}: {' '.join(slide_text)}")
+                
+                text = '\n'.join(text_parts)
+                
+                # Estrai e analizza immagini
+                images = extract_images_from_pptx(path)
+                for img_bytes in images:
+                    text += "\n" + analyze_image_bytes(img_bytes)
+                    
+            except Exception as e:
+                if language=="Italian":
+                    st.error(f"Errore elaborazione PowerPoint {path}: {e}")
+                else:
+                    st.error(f"PowerPoint processing error {path}: {e}")
+                return []
         elif ext in SUPPORTED_EXT['image']:
             text = pytesseract.image_to_string(Image.open(path), lang=t("tesslang"))
             text2 = generate_image_description(path)
