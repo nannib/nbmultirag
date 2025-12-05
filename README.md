@@ -25,7 +25,7 @@ Based on **PYTHON 3.12.4**
 ## ITALIANO
 Un framework in Italiano ed Inglese, che permette di chattare con i propri documenti in RAG, anche multimediali (audio, video, immagini e OCR).  
 Il framework è una GUI per chattare con un modello GPT scaricato da OLLAMA, si consiglia LLAMA 3.2 (2Gb) perfettamente performante anche su macchine medie oppure scegliere i modelli CLOUD di OLLAMA.  
-Inoltre, bisogna installare il software Tesseract, per il riconoscimento OCR, si consiglia di scegliere le lingue italiano ed inglese durante l'istallazione.  
+Inoltre, bisogna installare il software Tesseract (ATTENTI AD INCLUDERE LA LINGUA ITALIANA), per il riconoscimento OCR, si consiglia di scegliere le lingue italiano ed inglese durante l'istallazione.  
 NBMultiRag, permette di:
 1) Chattare col modello senza RAG.
 2) Creare dei workspace personalizzati e configurabili.
@@ -73,7 +73,7 @@ NBMultiRag, permette di:
 
 It is an Italian and English framework, which allows you to chat with your documents in RAG, including multimedia (audio, video, images and OCR).
 The framework is a GUI to chat with a GPT model downloaded from OLLAMA, we recommend LLAMA 3.2 (2Gb) which performs perfectly even on medium-sized machines or CLOUD models of OLLAMA.
-In addition, you need to install the Tesseract software, for OCR recognition, we recommend choosing Italian and English during installation.
+In addition, you need to install the Tesseract software (PAY ATTENTION TO INCLUDE YOUR LANGUAGE), for OCR recognition, we recommend choosing Italian and English during installation.
 NBMultiRag, allows you to:
 1) Chat with the model without RAG.
 2) Create custom and configurable workspaces.
