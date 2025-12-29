@@ -7,7 +7,7 @@ openai-whisper==20240930
 opencv-python==4.11.0.86
 openpyxl==3.1.5
 pillow==10.4.0
-PyPDF2==3.0.1
+PyPDF2
 pytesseract==0.3.13
 python-pptx==0.6.23
 requests==2.32.5
@@ -17,3 +17,4 @@ transformers==4.57.1
 docx==0.2.4
 python-docx==1.1.2
 pymupdf==1.26.4
+
