@@ -24,7 +24,11 @@ Based on **PYTHON 3.12.4**
 <a name="ITALIANO"></a>  
 ## ITALIANO
 Un framework in Italiano ed Inglese, che permette di chattare con i propri documenti in RAG, anche multimediali (audio, video, immagini e OCR).  
-Il framework è una GUI per chattare con un modello GPT scaricato da OLLAMA, si consiglia LLAMA 3.2 (2Gb) perfettamente performante anche su macchine medie oppure scegliere i modelli CLOUD di OLLAMA.  
+Il framework è una GUI per chattare con un modello GPT scaricato da OLLAMA, si consiglia LLAMA 3.2 (2Gb) perfettamente performante anche su macchine medie/piccole oppure scegliere i modelli CLOUD di OLLAMA. 
+
+PER GPU AMD DA POWERSHELL LANCIARE: $env:OLLAMA_VULKAN=1 ollama serve  
+
+
 Inoltre, bisogna installare il software Tesseract (ATTENTI AD INCLUDERE LA LINGUA ITALIANA), per il riconoscimento OCR, si consiglia di scegliere le lingue italiano ed inglese durante l'istallazione.  
 NBMultiRag, permette di:
 1) Chattare col modello senza RAG.
@@ -40,7 +44,7 @@ NBMultiRag, permette di:
 1) Lanciare il file install.bat (istalla Tesseract, Ollama, modello LLama3.2 o modelli Cloud e FFMpeg) - RIAVVIARE IL COMPUTER O APRIRE UN'ALTRA FINESTRA CMD.
 2) Nel framework seguire gli avvisi (es. scaricare un modello).
 3) Creare un workspace
-4) Scegliere un embedder (di default c'è bert-base-italian-uncased per l'Italiano e bert-base-uncased per l'Inglese.
+4) Scegliere un embedder (di default c'è bert-base-italian-uncased per l'Italiano e bert-base-uncased per l'Inglese). Consigliato nomic-embed-text.
 5) Aggiungere una cartella che contiene i documenti da indicizzare.
 6) Aggiornare l'indice.
 7) CHATTARE
@@ -73,6 +77,11 @@ NBMultiRag, permette di:
 
 It is an Italian and English framework, which allows you to chat with your documents in RAG, including multimedia (audio, video, images and OCR).
 The framework is a GUI to chat with a GPT model downloaded from OLLAMA, we recommend LLAMA 3.2 (2Gb) which performs perfectly even on medium-sized machines or CLOUD models of OLLAMA.
+
+
+FOR AMD GPU FROM POWERSHELL RUN: $env:OLLAMA_VULKAN=1 ollama serves
+
+
 In addition, you need to install the Tesseract software (PAY ATTENTION TO INCLUDE YOUR LANGUAGE), for OCR recognition, we recommend choosing Italian and English during installation.
 NBMultiRag, allows you to:
 1) Chat with the model without RAG.
@@ -88,7 +97,7 @@ NBMultiRag, allows you to:
 1) Run the install.bat file (it installs Tesseract, Ollama, LLama3.2 model and FFMpeg) - RESTART YOUR COMPUTER OR OPEN ANOTHER CMD WINDOW.
 2) In the framework follow the prompts (e.g. download a template).
 3) Create a workspace
-4) Choose an embedder (by default there is bert-base-italian-uncased for Italian and bert-base-uncased for English.
+4) Choose an embedder (by default there is bert-base-italian-uncased for Italian and bert-base-uncased for English. You can use nomic-embed-text too.
 5) Add a folder that contains the documents to be indexed.
 6) Update the index.
 7) CHAT
