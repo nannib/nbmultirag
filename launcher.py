@@ -12,7 +12,7 @@ import pickle
 from datetime import datetime
 from transformers import AutoTokenizer, AutoModel, BlipProcessor, BlipForConditionalGeneration
 import torch
-from pypdf import PdfReader
+from PyPDF2 import PdfReader
 import docx
 import openpyxl
 from bs4 import BeautifulSoup
@@ -41,4 +41,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
