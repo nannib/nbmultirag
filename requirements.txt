@@ -6,7 +6,7 @@ numpy==2.0.1
 openai-whisper==20240930
 opencv-python==4.11.0.86
 openpyxl==3.1.5
-pillow==10.4.0
+pillow
 PyPDF2
 pytesseract==0.3.13
 python-pptx==0.6.23
